@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<head>
+    <script type = "text/javascript">
+        function read (f) {
+            if (f.files && f.files[0]) {
+                var filename = f.files[0].name;
+                var reader = new FileReader();
+                reader.readAsText(f.files[0]);
+                reader.onload = function (e) {
+                    file = e.target.result;
+                };
+            }
+        }
+        function check () {
+            if (file != null) {
+                conn.send(file);
+                window.location.reload();
+            } else {
+                delay += delay * .1;
+                setTimeout(check, delay);
+            }
+        }
+
+        var DELAY = 1000;
+
+        var delay = DELAY;
+        var file = null;
+        window.onload = function () {
+            document.getElementById("myFile").onchange = function () {
+                read(this);
+            };
+            document.getElementById("wakeUp").onclick = function () {
+                delay = DELAY;
+            };
+        };
+
+        var conn = new WebSocket("ws://m0dem.grepper.net:6125");
+        conn.onmessage = function(e) {
+            console.log(e.data);
+        };
+        conn.onopen = function() {
+            check();
+        };
+    </script>
+</head>
+<body>
+    <input id = "myFile" type = "file" />
+    <br />
+    <input id = "wakeUp" type = "button" value = "Wake Up" />
+</body>
+</html>
